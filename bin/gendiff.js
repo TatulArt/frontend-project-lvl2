@@ -14,7 +14,7 @@ commander
     (async () => {
       console.log(await genDiff(filepath1, filepath2));
     })();
-  });
+  }); //
 
 commander.parse(process.argv);
 
