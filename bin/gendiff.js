@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import genDiff from '../src/index.js';
+import genDiff from '../src/differencesGenerator.js';
 
 const commander = new Command();
 
@@ -14,7 +14,7 @@ commander
     (async () => {
       console.log(await genDiff(filepath1, filepath2));
     })();
-  }); //
+  });
 
 commander.parse(process.argv);
 
