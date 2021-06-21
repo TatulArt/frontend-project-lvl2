@@ -19,4 +19,4 @@ jobs:
       run: npm i
       
     - name: 'test'
-      run: npx eslint .
+      run: make lint
