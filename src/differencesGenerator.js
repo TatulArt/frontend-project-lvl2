@@ -32,9 +32,31 @@ const compareObjects = (obj1, obj2) => {
 };
 
 const genDiff = (filepath1, filepath2) => {
-  const obj1 = JSON.parse(readFileSync(path.resolve(filepath1), 'utf-8'));
-  const obj2 = JSON.parse(readFileSync(path.resolve(filepath2), 'utf-8'));
+  if (filepath1 === '' || filepath2 === '') {
+    return '{}';
+  }
 
+  try {
+    readFileSync(path.resolve(process.cwd(), filepath1));
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      console.log(`Error! File "${process.cwd()}/${filepath1}" not found.`);
+    }
+    return '';
+  }
+
+  try {
+    readFileSync(path.resolve(process.cwd(), filepath2));
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      console.log('Error!');
+      console.log(`Error! File "${process.cwd()}/${filepath2}" not found.`);
+    }
+    return '';
+  }
+
+  const obj1 = JSON.parse(readFileSync(path.resolve(process.cwd(), filepath1), 'utf-8'));
+  const obj2 = JSON.parse(readFileSync(path.resolve(process.cwd(), filepath2), 'utf-8'));
   const result = compareObjects(obj1, obj2);
   return result;
 };
