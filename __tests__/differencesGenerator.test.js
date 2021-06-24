@@ -12,17 +12,12 @@ flatFilesResult.push('  + timeout: 20');
 flatFilesResult.push('  + verbose: true');
 flatFilesResult.push('}');
 
-test('flatJSON', () => {
+test('emptyFilepaths', () => {
+  expect(genDiff('', '')).toEqual('{}');
+});
+
+test('flatFles', () => {
   expect(genDiff('__fixtures__/file1.json', '__fixtures__/file2.json')).toEqual(flatFilesResult.join('\n'));
-  expect(genDiff('', '')).toEqual('{}');
-});
-
-test('flatYAML', () => {
   expect(genDiff('__fixtures__/file1.yaml', '__fixtures__/file2.yaml')).toEqual(flatFilesResult.join('\n'));
-  expect(genDiff('', '')).toEqual('{}');
-});
-
-test('differentExtentions', () => {
   expect(genDiff('__fixtures__/file1.yaml', '__fixtures__/file2.json')).toEqual(flatFilesResult.join('\n'));
-  expect(genDiff('', '')).toEqual('{}');
 });
