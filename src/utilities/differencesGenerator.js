@@ -2,37 +2,47 @@ import { readFileSync } from 'fs';
 import _ from 'lodash';
 import path from 'path';
 import parceData from './parsers.js';
+import objToStr from './objToStr.js';
 
 const compareObjects = (obj1, obj2) => {
-  const result = [];
-  result.push('{');
+  const result = {};
 
-  const file1Diffs = [];
-  const keysOfObj1 = Object.keys(obj1);
-  _.sortBy(keysOfObj1).forEach((key) => {
+  const obj1Keys = Object.keys(obj1);
+  _.sortBy(obj1Keys).forEach((key) => {
+    if (_.hasIn(obj1, key) && _.hasIn(obj2, key) && typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
+      result[`  ${key}`] = compareObjects(obj1[key], obj2[key]);
+      return;
+    }
+
     if (!_.hasIn(obj2, key)) {
-      file1Diffs.push(`  - ${key}: ${obj1[key]}`);
+      result[`- ${key}`] = obj1[key];
     }
 
     if (obj2[key] === obj1[key]) {
-      file1Diffs.push(`    ${key}: ${obj1[key]}`);
+      result[`  ${key}`] = obj1[key];
     }
   });
 
-  const file2Diffs = [];
-  const keysOfObj2 = Object.keys(obj2);
-  _.sortBy(keysOfObj2).forEach((key) => {
+  const obj2Keys = Object.keys(obj2);
+  _.sortBy(obj2Keys).forEach((key) => {
     if (!_.hasIn(obj1, key)) {
-      file2Diffs.push(`  + ${key}: ${obj2[key]}`);
-    } else if (obj2[key] !== obj1[key]) {
-      file2Diffs.unshift(`  - ${key}: ${obj1[key]}\n  + ${key}: ${obj2[key]}`);
+      result[`+ ${key}`] = obj2[key];
+      return;
+    }
+
+    if (obj2[key] !== obj1[key] && typeof obj2[key] !== 'object') {
+      result[`- ${key}`] = obj1[key];
+      result[`+ ${key}`] = obj2[key];
+      return;
+    }
+
+    if (obj2[key] !== obj1[key] && typeof obj1[key] !== 'object' && typeof obj2[key] !== 'object') {
+      result[`- ${key}`] = obj1[key];
+      result[`+ ${key}`] = obj2[key];
     }
   });
 
-  result.push(file1Diffs, file2Diffs);
-  result.push('}');
-
-  return result.flat().join('\n');
+  return result;
 };
 
 const genDiff = (filepath1, filepath2) => {
@@ -49,7 +59,7 @@ const genDiff = (filepath1, filepath2) => {
   const obj2 = parceData(data2, extention2);
 
   const result = compareObjects(obj1, obj2);
-  return result;
+  return objToStr(result, 1);
 };
 
 export default genDiff;
