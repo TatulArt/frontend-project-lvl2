@@ -1,53 +1,13 @@
 import { readFileSync } from 'fs';
-import _ from 'lodash';
 import path from 'path';
-import parceData from './parsers.js';
-import objToStr from './objToStr.js';
+import parceData from './parser.js';
+import stylish from './formaters.js';
 
-const compareObjects = (obj1, obj2) => {
-  const result = {};
-
-  const obj1Keys = Object.keys(obj1);
-  const obj2Keys = Object.keys(obj2);
-
-  const keys = _.union(obj1Keys, obj2Keys);
-
-  _.sortBy(keys).forEach((key) => {
-    if (_.hasIn(obj1, key) && _.hasIn(obj2, key) && typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
-      result[`  ${key}`] = compareObjects(obj1[key], obj2[key]);
-      return;
-    }
-
-    if (!_.hasIn(obj2, key)) {
-      result[`- ${key}`] = obj1[key];
-      return;
-    }
-
-    if (obj2[key] === obj1[key]) {
-      result[`  ${key}`] = obj1[key];
-    }
-
-    if (!_.hasIn(obj1, key)) {
-      result[`+ ${key}`] = obj2[key];
-      return;
-    }
-
-    if (obj2[key] !== obj1[key] && typeof obj2[key] !== 'object') {
-      result[`- ${key}`] = obj1[key];
-      result[`+ ${key}`] = obj2[key];
-      return;
-    }
-
-    if (obj2[key] !== obj1[key] && typeof obj1[key] !== 'object' && typeof obj2[key] !== 'object') {
-      result[`- ${key}`] = obj1[key];
-      result[`+ ${key}`] = obj2[key];
-    }
-  });
-
-  return result;
+const formaters = {
+  stylish,
 };
 
-const genDiff = (filepath1, filepath2) => {
+const genDiff = (filepath1, filepath2, format) => {
   if (filepath1 === '' || filepath2 === '') {
     return '{}';
   }
@@ -60,8 +20,8 @@ const genDiff = (filepath1, filepath2) => {
   const extention2 = path.extname(filepath2);
   const obj2 = parceData(data2, extention2);
 
-  const result = compareObjects(obj1, obj2);
-  return objToStr(result, 1);
+  const selectedFormater = formaters[format];
+  return selectedFormater(obj1, obj2);
 };
 
 export default genDiff;
