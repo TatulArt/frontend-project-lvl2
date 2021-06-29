@@ -5,7 +5,7 @@ const objToStr = (obj, depthLevel) => {
   const keys = Object.keys(obj);
   keys.forEach((key) => {
     if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-      result.push(`${'  '.repeat(depthLevel)}${key}: ${objToStr(obj[key], depthLevel + 1)}`);
+      result.push(`${'  '.repeat(depthLevel)}${key}: ${objToStr(obj[key], depthLevel + 2)}`);
     } else {
       result.push(`${'  '.repeat(depthLevel)}${key}: ${obj[key]}`);
     }
