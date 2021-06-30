@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import objToStr from './objToStr.js';
+import objToStr from '../objToStr.js';
 
 const stylish = (obj1, obj2) => {
   const result = {};

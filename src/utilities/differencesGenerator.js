@@ -1,11 +1,7 @@
 import { readFileSync } from 'fs';
 import path from 'path';
 import parceData from './parser.js';
-import stylish from './formaters.js';
-
-const formaters = {
-  stylish,
-};
+import formatters from './formatters/index.js';
 
 const genDiff = (filepath1, filepath2, format) => {
   if (filepath1 === '' || filepath2 === '') {
@@ -20,7 +16,7 @@ const genDiff = (filepath1, filepath2, format) => {
   const extention2 = path.extname(filepath2);
   const obj2 = parceData(data2, extention2);
 
-  const selectedFormater = formaters[format];
+  const selectedFormater = formatters[format];
   return selectedFormater(obj1, obj2);
 };
 
