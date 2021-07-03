@@ -1,19 +1,25 @@
-import _ from 'lodash';
-
-const getPathToKey = (obj, key) => {
-  if (_.has(obj, key)) {
-    return key;
+const isobject = (x) => {
+  if (typeof x === 'object' && !Array.isArray(x) && x !== null && x !== undefined) {
+    return true;
   }
 
-  const objKeys = Object.keys(obj);
-  keys.forEach((objKey) => {
-    if (typeof obj[objKey] !== 'object') {
-      return;
-    }
-
-    const path = getPathToKey(obj[objKey], key);
-    if(path) return props[i] + '.' + path;
-  });
+  return false;
 };
 
+const getPathToKey = (obj, value, prefix = '') => {
+  const keys = Object.keys(obj);
+
+  const path = keys.map((key) => {
+    if (key === value) {
+      return `${prefix}${key}`;
+    }
+
+    if (isobject(obj[key])) {
+      getPathToKey(obj[key], value, `${prefix}${key}.`);
+    }
+  });
+
+  console.log(path);
+  return path;
+};
 export default getPathToKey;
