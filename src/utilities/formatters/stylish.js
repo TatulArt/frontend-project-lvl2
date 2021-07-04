@@ -10,27 +10,31 @@ const getStylishDiff = (diff) => {
       return;
     }
 
-    if (diff[key].state === 'without changes') {
-      stylishDiff[`  ${key}`] = diff[key].value;
-      return;
-    }
-
-    if (diff[key].state === 'added') {
-      stylishDiff[`+ ${key}`] = diff[key].value;
-      return;
-    }
-
-    if (diff[key].state === 'removed') {
-      stylishDiff[`- ${key}`] = diff[key].value;
-      return;
-    }
-
     if (diff[key].state === 'changed') {
       const [previousValue, presentValue] = diff[key].value;
 
       stylishDiff[`- ${key}`] = previousValue;
       stylishDiff[`+ ${key}`] = presentValue;
+      return;
     }
+
+    let newKey = '';
+
+    switch (diff[key].state) {
+      case 'added':
+        newKey = `+ ${key}`;
+        break;
+      case 'without changes':
+        newKey = `  ${key}`;
+        break;
+      case 'removed':
+        newKey = `- ${key}`;
+        break;
+      default:
+        break;
+    }
+
+    stylishDiff[newKey] = diff[key].value;
   });
 
   return stylishDiff;
