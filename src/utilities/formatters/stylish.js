@@ -9,10 +9,8 @@ const modifyKeyByState = (state, key) => {
     case 'removed':
       return `- ${key}`;
     default:
-      break;
+      throw new Error(`Unknown state: ${state}`);
   }
-
-  return key;
 };
 
 const getStylishDiff = (diff) => {
