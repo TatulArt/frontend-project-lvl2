@@ -1,5 +1,20 @@
 import objToStr from '../objToStr.js';
 
+const modifyKeyByState = (state, key) => {
+  switch (state) {
+    case 'added':
+      return `+ ${key}`;
+    case 'without changes':
+      return `  ${key}`;
+    case 'removed':
+      return `- ${key}`;
+    default:
+      break;
+  }
+
+  return key;
+};
+
 const getStylishDiff = (diff) => {
   const stylishDiff = {};
   const keys = Object.keys(diff);
@@ -18,22 +33,7 @@ const getStylishDiff = (diff) => {
       return;
     }
 
-    let newKey = '';
-
-    switch (diff[key].state) {
-      case 'added':
-        newKey = `+ ${key}`;
-        break;
-      case 'without changes':
-        newKey = `  ${key}`;
-        break;
-      case 'removed':
-        newKey = `- ${key}`;
-        break;
-      default:
-        break;
-    }
-
+    const newKey = modifyKeyByState(diff[key].state, key);
     stylishDiff[newKey] = diff[key].value;
   });
 
