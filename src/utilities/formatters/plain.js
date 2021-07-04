@@ -1,5 +1,13 @@
 import _ from 'lodash';
 
+const getValidValue = (data) => {
+  if (typeof data !== 'string' && !_.isObject(data)) {
+    return `${data}`;
+  }
+
+  return _.isObject(data) ? '[complex value]' : `'${data}'`;
+};
+
 const plain = (diff, path = '') => {
   const plainDiff = [];
 
@@ -8,24 +16,13 @@ const plain = (diff, path = '') => {
     const currentPath = `${path}${key}`;
 
     if (diff[key].state === 'changed') {
-      let previousValue = _.isObject(diff[key].value[0]) ? '[complex value]' : `'${diff[key].value[0]}'`;
-      if (typeof diff[key].value[0] !== 'string' && !_.isObject(diff[key].value[0])) {
-        previousValue = `${diff[key].value[0]}`;
-      }
-
-      let presentValue = _.isObject(diff[key].value[1]) ? '[complex value]' : `'${diff[key].value[1]}'`;
-      if (typeof diff[key].value[1] !== 'string' && !_.isObject(diff[key].value[1])) {
-        presentValue = `${diff[key].value[1]}`;
-      }
+      const previousValue = getValidValue(diff[key].value[0]);
+      const presentValue = getValidValue(diff[key].value[1]);
 
       plainDiff.push(`Property '${currentPath}' was updated. From ${previousValue} to ${presentValue}`);
     }
 
-    let value = _.isObject(diff[key].value) ? '[complex value]' : `'${diff[key].value}'`;
-
-    if (typeof diff[key].value !== 'string' && !_.isObject(diff[key].value)) {
-      value = `${diff[key].value}`;
-    }
+    const value = getValidValue(diff[key].value);
 
     if (diff[key].state === 'same-name objects') {
       plainDiff.push(plain(diff[key].value, `${currentPath}.`));
@@ -40,7 +37,7 @@ const plain = (diff, path = '') => {
     }
   });
 
-  return plainDiff.flat().join('\n');
+  return plainDiff.join('\n');
 };
 
 export default plain;
