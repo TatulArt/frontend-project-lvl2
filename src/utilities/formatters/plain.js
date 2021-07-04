@@ -1,41 +1,35 @@
 import _ from 'lodash';
-import getPathToKey from '../getPathToKey.js';
 
-const plain = (obj1, obj2) => {
-  const obj1Keys = Object.keys(obj1);
-  const obj2Keys = Object.keys(obj2);
+const plain = (diff, path = '') => {
+  const plainDiff = [];
 
-  const result = [];
-
-  const keys = _.union(obj1Keys, obj2Keys);
+  const keys = Object.keys(diff);
   _.sortBy(keys).forEach((key) => {
-    const value1 = typeof obj1[key] === 'object' && obj1[key] !== null ? '[complex value]' : `'${obj1[key]}'`;
-    const value2 = typeof obj2[key] === 'object' && obj2[key] !== null ? '[complex value]' : `'${obj2[key]}'`;
+    const currentPath = `${path}${key}`;
 
-    if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
-      if (JSON.stringify(obj1[key]) === JSON.stringify(obj2[key])) {
-        return;
-      }
-      result.push(plain(obj1[key], obj2[key]));
-      return;
+    if (diff[key].state === 'changed') {
+      const previousValue = _.isObject(diff[key].value[0]) ? '[complex value]' : `'${diff[key].value[0]}'`;
+      const presentValue = _.isObject(diff[key].value[1]) ? '[complex value]' : `'${diff[key].value[1]}'`;
+
+      plainDiff.push(`Property '${currentPath}' was updated. From ${previousValue} to ${presentValue}`);
     }
 
-    if (!_.hasIn(obj2, key)) {
-      result.push(`Property '${getPathToKey(obj1, key)}' was removed`);
-      return;
+    const value = typeof diff[key].value !== 'object' && diff[key].value !== null ? diff[key].value : '[complex value]';
+
+    if (diff[key].state === 'same-name objects') {
+      plainDiff.push(plain(diff[key].value, `${currentPath}.`));
     }
 
-    if (!_.hasIn(obj1, key)) {
-      result.push(`Property '${getPathToKey(obj2, key)}' was added with value: ${value2}`);
-      return;
+    if (diff[key].state === 'added') {
+      plainDiff.push(`Property '${currentPath}' was added with value: ${value}`);
     }
 
-    if (obj1[key] !== obj2[key]) {
-      result.push(`Property '${getPathToKey(obj1, key)}' was updated. From ${value1} to ${value2}`);
+    if (diff[key].state === 'removed') {
+      plainDiff.push(`Property '${currentPath}' was removed.`);
     }
   });
 
-  return result.flat().join('\n');
+  return plainDiff.flat().join('\n');
 };
 
 export default plain;

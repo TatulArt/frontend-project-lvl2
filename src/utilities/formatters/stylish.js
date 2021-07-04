@@ -1,47 +1,44 @@
-import _ from 'lodash';
 import objToStr from '../objToStr.js';
 
-const stylish = (obj1, obj2) => {
-  const result = {};
+const getStylishDiff = (diff) => {
+  const stylishDiff = {};
+  const keys = Object.keys(diff);
 
-  const obj1Keys = Object.keys(obj1);
-  const obj2Keys = Object.keys(obj2);
-
-  const keys = _.union(obj1Keys, obj2Keys);
-
-  _.sortBy(keys).forEach((key) => {
-    if (_.hasIn(obj1, key) && _.hasIn(obj2, key) && typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
-      result[`  ${key}`] = stylish(obj1[key], obj2[key]);
+  keys.forEach((key) => {
+    if (diff[key].state === 'same-name objects') {
+      stylishDiff[`  ${key}`] = getStylishDiff(diff[key].value);
       return;
     }
 
-    if (!_.hasIn(obj2, key)) {
-      result[`- ${key}`] = obj1[key];
+    if (diff[key].state === 'without changes') {
+      stylishDiff[`  ${key}`] = diff[key].value;
       return;
     }
 
-    if (obj2[key] === obj1[key]) {
-      result[`  ${key}`] = obj1[key];
-    }
-
-    if (!_.hasIn(obj1, key)) {
-      result[`+ ${key}`] = obj2[key];
+    if (diff[key].state === 'added') {
+      stylishDiff[`+ ${key}`] = diff[key].value;
       return;
     }
 
-    if (obj2[key] !== obj1[key] && typeof obj2[key] !== 'object') {
-      result[`- ${key}`] = obj1[key];
-      result[`+ ${key}`] = obj2[key];
+    if (diff[key].state === 'removed') {
+      stylishDiff[`- ${key}`] = diff[key].value;
       return;
     }
 
-    if (obj2[key] !== obj1[key] && typeof obj1[key] !== 'object' && typeof obj2[key] !== 'object') {
-      result[`- ${key}`] = obj1[key];
-      result[`+ ${key}`] = obj2[key];
+    if (diff[key].state === 'changed') {
+      const [previousValue, presentValue] = diff[key].value;
+
+      stylishDiff[`- ${key}`] = previousValue;
+      stylishDiff[`+ ${key}`] = presentValue;
     }
   });
 
-  return objToStr(result, 1);
+  return stylishDiff;
+};
+
+const stylish = (diff) => {
+  const stylishDiff = getStylishDiff(diff);
+  return objToStr(stylishDiff);
 };
 
 export default stylish;
