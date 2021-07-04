@@ -8,13 +8,24 @@ const plain = (diff, path = '') => {
     const currentPath = `${path}${key}`;
 
     if (diff[key].state === 'changed') {
-      const previousValue = _.isObject(diff[key].value[0]) ? '[complex value]' : `'${diff[key].value[0]}'`;
-      const presentValue = _.isObject(diff[key].value[1]) ? '[complex value]' : `'${diff[key].value[1]}'`;
+      let previousValue = _.isObject(diff[key].value[0]) ? '[complex value]' : `'${diff[key].value[0]}'`;
+      if (typeof diff[key].value[0] !== 'string' && !_.isObject(diff[key].value[0])) {
+        previousValue = `${diff[key].value[0]}`;
+      }
+
+      let presentValue = _.isObject(diff[key].value[1]) ? '[complex value]' : `'${diff[key].value[1]}'`;
+      if (typeof diff[key].value[1] !== 'string' && !_.isObject(diff[key].value[1])) {
+        presentValue = `${diff[key].value[1]}`;
+      }
 
       plainDiff.push(`Property '${currentPath}' was updated. From ${previousValue} to ${presentValue}`);
     }
 
-    const value = typeof diff[key].value !== 'object' && diff[key].value !== null ? diff[key].value : '[complex value]';
+    let value = _.isObject(diff[key].value) ? '[complex value]' : `'${diff[key].value}'`;
+
+    if (typeof diff[key].value !== 'string' && !_.isObject(diff[key].value)) {
+      value = `${diff[key].value}`;
+    }
 
     if (diff[key].state === 'same-name objects') {
       plainDiff.push(plain(diff[key].value, `${currentPath}.`));
@@ -25,7 +36,7 @@ const plain = (diff, path = '') => {
     }
 
     if (diff[key].state === 'removed') {
-      plainDiff.push(`Property '${currentPath}' was removed.`);
+      plainDiff.push(`Property '${currentPath}' was removed`);
     }
   });
 
