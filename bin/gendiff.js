@@ -18,4 +18,3 @@ commander.parse(process.argv);
 
 const options = commander.opts();
 if (options.version) console.log('1.0.0');
-if (options.format) console.log(`${options.format}`);
