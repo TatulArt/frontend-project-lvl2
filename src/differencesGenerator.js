@@ -31,7 +31,7 @@ const differencesGenerator = (obj1, obj2) => {
     if (obj2[key] === obj1[key]) {
       filesDiffrences[key] = {
         value: obj1[key],
-        state: 'without changes',
+        state: 'unchanged',
       };
     }
 

@@ -1,16 +1,37 @@
+import _ from 'lodash';
 import objToStr from '../objToStr.js';
 
 const modifyKeyByState = (state, key) => {
   switch (state) {
     case 'added':
       return `+ ${key}`;
-    case 'without changes':
+    case 'unchanged':
       return `  ${key}`;
     case 'removed':
       return `- ${key}`;
     default:
       throw new Error(`Unknown state: ${state}`);
   }
+};
+
+const modifyValue = (value) => {
+  if (_.isObject(value) && !Array.isArray(value)) {
+    const keys = Object.keys(value);
+    const result = {};
+
+    keys.forEach((key) => {
+      if (_.isObject(value[key]) && !Array.isArray(value[key])) {
+        result[`  ${key}`] = modifyValue(value[key]);
+        return;
+      }
+
+      result[`  ${key}`] = value[key];
+    });
+
+    return result;
+  }
+
+  return value;
 };
 
 const getStylishDiff = (diff) => {
@@ -26,13 +47,13 @@ const getStylishDiff = (diff) => {
     if (diff[key].state === 'changed') {
       const [previousValue, presentValue] = diff[key].value;
 
-      stylishDiff[`- ${key}`] = previousValue;
-      stylishDiff[`+ ${key}`] = presentValue;
+      stylishDiff[`- ${key}`] = modifyValue(previousValue);
+      stylishDiff[`+ ${key}`] = modifyValue(presentValue);
       return;
     }
 
     const newKey = modifyKeyByState(diff[key].state, key);
-    stylishDiff[newKey] = diff[key].value;
+    stylishDiff[newKey] = modifyValue(diff[key].value);
   });
 
   return stylishDiff;
