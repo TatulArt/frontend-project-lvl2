@@ -5,49 +5,53 @@ import parceData from './utilities/parser.js';
 import formatters from './utilities/formatters/index.js';
 
 const differencesGenerator = (obj1, obj2) => {
-  const filesDiffrences = {};
   const obj1Keys = Object.keys(obj1);
   const obj2Keys = Object.keys(obj2);
 
   const keys = _.union(obj1Keys, obj2Keys);
 
-  _.sortBy(keys).forEach((key) => {
+  const filesDiffrences = _.sortBy(keys).map((key) => {
     if (_.hasIn(obj1, key) && _.hasIn(obj2, key) && obj1[key] !== obj2[key]) {
       if (_.isObject(obj1[key]) && _.isObject(obj2[key])) {
-        filesDiffrences[key] = {
+        return {
+          key,
           value: differencesGenerator(obj1[key], obj2[key]),
           state: 'same-name objects',
         };
-      } else {
-        filesDiffrences[key] = {
-          value: [obj1[key], obj2[key]],
-          state: 'changed',
-        };
       }
 
-      return;
+      return {
+        key,
+        value: [obj1[key], obj2[key]],
+        state: 'changed',
+      };
     }
 
     if (obj2[key] === obj1[key]) {
-      filesDiffrences[key] = {
+      return {
+        key,
         value: obj1[key],
         state: 'unchanged',
       };
     }
 
     if (!_.hasIn(obj1, key)) {
-      filesDiffrences[key] = {
+      return {
+        key,
         value: obj2[key],
         state: 'added',
       };
     }
 
     if (!_.hasIn(obj2, key)) {
-      filesDiffrences[key] = {
+      return {
+        key,
         value: obj1[key],
         state: 'removed',
       };
     }
+
+    throw new Error('Unknown state');
   });
 
   return filesDiffrences;
