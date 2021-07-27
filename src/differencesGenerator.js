@@ -4,25 +4,49 @@ import _ from 'lodash';
 import parceData from './utilities/parser.js';
 import formatters from './utilities/formatters/index.js';
 
-const differencesGenerator = (obj1, obj2) => {
-  const obj1Keys = Object.keys(obj1);
-  const obj2Keys = Object.keys(obj2);
+const processUnchangedObject = (value) => {
+  if (_.isObject(value) && !_.isArray(value)) {
+    const objKeys = Object.keys(value);
 
-  const keys = _.union(obj1Keys, obj2Keys);
-
-  const filesDiffrences = _.sortBy(keys).map((key) => {
-    if (_.hasIn(obj1, key) && _.hasIn(obj2, key) && obj1[key] !== obj2[key]) {
-      if (_.isObject(obj1[key]) && _.isObject(obj2[key])) {
+    return objKeys.map((key) => {
+      if (_.isObject(value[key]) && !_.isArray(value[key])) {
         return {
           key,
-          value: differencesGenerator(obj1[key], obj2[key]),
-          state: 'same-name objects',
+          value: processUnchangedObject(value[key]),
+          state: 'unchangedObject',
         };
       }
 
       return {
         key,
-        value: [obj1[key], obj2[key]],
+        value: value[key],
+        state: 'unchangedObject',
+      };
+    });
+  }
+
+  return value;
+};
+
+const differencesGenerator = (obj1, obj2) => {
+  const obj1Keys = Object.keys(obj1);
+  const obj2Keys = Object.keys(obj2);
+
+  const keys = _.sortBy(_.union(obj1Keys, obj2Keys));
+
+  const filesDiffrences = keys.map((key) => {
+    if (_.hasIn(obj1, key) && _.hasIn(obj2, key) && obj1[key] !== obj2[key]) {
+      if (_.isObject(obj1[key]) && _.isObject(obj2[key])) {
+        return {
+          key,
+          value: differencesGenerator(obj1[key], obj2[key]),
+          state: 'sameNameObjects',
+        };
+      }
+
+      return {
+        key,
+        value: [processUnchangedObject(obj1[key]), processUnchangedObject(obj2[key])],
         state: 'changed',
       };
     }
@@ -30,7 +54,7 @@ const differencesGenerator = (obj1, obj2) => {
     if (obj2[key] === obj1[key]) {
       return {
         key,
-        value: obj1[key],
+        value: processUnchangedObject(obj1[key]),
         state: 'unchanged',
       };
     }
@@ -38,7 +62,7 @@ const differencesGenerator = (obj1, obj2) => {
     if (!_.hasIn(obj1, key)) {
       return {
         key,
-        value: obj2[key],
+        value: processUnchangedObject(obj2[key]),
         state: 'added',
       };
     }
@@ -46,7 +70,7 @@ const differencesGenerator = (obj1, obj2) => {
     if (!_.hasIn(obj2, key)) {
       return {
         key,
-        value: obj1[key],
+        value: processUnchangedObject(obj1[key]),
         state: 'removed',
       };
     }
@@ -71,6 +95,7 @@ const genDiff = (filepath1, filepath2, format = 'stylish') => {
   const obj2 = parceData(data2, extention2);
 
   const diff = differencesGenerator(obj1, obj2);
+  console.log(diff);
 
   const selectedFormater = formatters[format];
   return selectedFormater(diff);
