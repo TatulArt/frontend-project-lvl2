@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { addElementsToArray } from '../mutationLessUtilities.js';
 
 const getValidValue = (data) => {
   if (typeof data !== 'string' && !_.isObject(data)) {
@@ -8,36 +9,34 @@ const getValidValue = (data) => {
   return _.isObject(data) ? '[complex value]' : `'${data}'`;
 };
 
-const plain = (diff, path = '') => {
-  const plainDiff = [];
+const plain = (diff, path = '') => diff.reduce((acc, diffElement) => {
+  const currentPath = `${path}${diffElement.key}`;
 
-  const keys = Object.keys(diff);
-  _.sortBy(keys).forEach((key) => {
-    const currentPath = `${path}${key}`;
+  if (diffElement.state === 'changed') {
+    const previousValue = getValidValue(diffElement.value[0]);
+    const presentValue = getValidValue(diffElement.value[1]);
 
-    if (diff[key].state === 'changed') {
-      const previousValue = getValidValue(diff[key].value[0]);
-      const presentValue = getValidValue(diff[key].value[1]);
+    const message = `Property '${currentPath}' was updated. From ${previousValue} to ${presentValue}`;
+    return addElementsToArray(acc, message);
+  }
 
-      plainDiff.push(`Property '${currentPath}' was updated. From ${previousValue} to ${presentValue}`);
-    }
+  if (diffElement.state === 'sameNameObjects') {
+    return addElementsToArray(acc, plain(diffElement.value, `${currentPath}.`));
+  }
 
-    const value = getValidValue(diff[key].value);
+  const value = getValidValue(diffElement.value);
 
-    if (diff[key].state === 'same-name objects') {
-      plainDiff.push(plain(diff[key].value, `${currentPath}.`));
-    }
+  if (diffElement.state === 'added') {
+    const message = `Property '${currentPath}' was added with value: ${value}`;
+    return addElementsToArray(acc, message);
+  }
 
-    if (diff[key].state === 'added') {
-      plainDiff.push(`Property '${currentPath}' was added with value: ${value}`);
-    }
+  if (diffElement.state === 'removed') {
+    const message = `Property '${currentPath}' was removed`;
+    return addElementsToArray(acc, message);
+  }
 
-    if (diff[key].state === 'removed') {
-      plainDiff.push(`Property '${currentPath}' was removed`);
-    }
-  });
-
-  return plainDiff.join('\n');
-};
+  return acc;
+}, []).join('\n');
 
 export default plain;
