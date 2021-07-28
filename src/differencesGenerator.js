@@ -3,25 +3,20 @@ import path from 'path';
 import _ from 'lodash';
 import parceData from './utilities/parser.js';
 import formatters from './utilities/formatters/index.js';
+import { addElementsToObject } from './utilities/mutationLessUtilities.js';
 
 const processUnchangedObject = (value) => {
   if (_.isObject(value) && !_.isArray(value)) {
     const objKeys = Object.keys(value);
 
     return objKeys.map((key) => {
-      if (_.isObject(value[key]) && !_.isArray(value[key])) {
-        return {
-          key,
-          value: processUnchangedObject(value[key]),
-          state: 'unchanged',
-        };
-      }
-
-      return {
+      const result = {
         key,
         value: value[key],
         state: 'unchanged',
       };
+
+      return _.isObject(value[key]) && !_.isArray(value[key]) ? addElementsToObject(result, 'value', processUnchangedObject(value[key])) : result;
     });
   }
 

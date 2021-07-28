@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import objToStr from '../objToStr.js';
-import { addElementToObject } from '../mutationLessUtilities.js';
+import { addElementsToObject } from '../mutationLessUtilities.js';
 
 const modifyKeyByState = (state, key) => {
   switch (state) {
@@ -23,12 +23,12 @@ const getStylishDiff = (data) => {
       if (dataElement.state === 'changed') {
         const [previousValue, presentValue] = dataElement.value;
 
-        const newAccPrototype = addElementToObject(acc, `- ${dataElement.key}`, getStylishDiff(previousValue));
-        return addElementToObject(newAccPrototype, `+ ${dataElement.key}`, getStylishDiff(presentValue));
+        const newAccPrototype = addElementsToObject(acc, `- ${dataElement.key}`, getStylishDiff(previousValue));
+        return addElementsToObject(newAccPrototype, `+ ${dataElement.key}`, getStylishDiff(presentValue));
       }
 
       const newKey = modifyKeyByState(dataElement.state, dataElement.key);
-      return addElementToObject(acc, newKey, getStylishDiff(dataElement.value));
+      return addElementsToObject(acc, newKey, getStylishDiff(dataElement.value));
     }, {});
 
     return stylishDiff;
