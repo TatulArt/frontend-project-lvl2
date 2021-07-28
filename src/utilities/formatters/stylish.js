@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import objToStr from '../objToStr.js';
+import { addElementToObject } from '../mutationLessUtilities.js';
 
 const modifyKeyByState = (state, key) => {
   switch (state) {
@@ -18,32 +19,29 @@ const modifyKeyByState = (state, key) => {
   }
 };
 
-const getStylishDiff = (diff) => {
-  if (_.isArray(diff)) {
-    const stylishDiff = diff.map((diffElement) => {
-      if (diffElement.state === 'changed') {
-        const [previousValue, presentValue] = diffElement.value;
+const getStylishDiff = (data) => {
+  if (_.isArray(data)) {
+    const stylishDiff = data.reduce((acc, dataElement) => {
+      if (dataElement.state === 'changed') {
+        const [previousValue, presentValue] = dataElement.value;
 
-        return [
-          [`- ${diffElement.key}`, getStylishDiff(previousValue)],
-          [`+ ${diffElement.key}`, getStylishDiff(presentValue)],
-        ];
+        const newAccPrototype = addElementToObject(acc, `- ${dataElement.key}`, getStylishDiff(previousValue));
+        return addElementToObject(newAccPrototype, `+ ${dataElement.key}`, getStylishDiff(presentValue));
       }
 
-      const newKey = modifyKeyByState(diffElement.state, diffElement.key);
-      return [newKey, getStylishDiff(diffElement.value)];
-    });
+      const newKey = modifyKeyByState(dataElement.state, dataElement.key);
+      return addElementToObject(acc, newKey, getStylishDiff(dataElement.value));
+    }, {});
 
-    console.log(stylishDiff);
     return stylishDiff;
   }
 
-  return diff;
+  return data;
 };
 
 const stylish = (diff) => {
   const stylishDiff = getStylishDiff(diff);
-  return objToStr(stylishDiff); // поменяй
+  return objToStr(stylishDiff);
 };
 
 export default stylish;

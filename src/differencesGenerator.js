@@ -95,7 +95,6 @@ const genDiff = (filepath1, filepath2, format = 'stylish') => {
   const obj2 = parceData(data2, extention2);
 
   const diff = differencesGenerator(obj1, obj2);
-  console.log(diff);
 
   const selectedFormater = formatters[format];
   return selectedFormater(diff);

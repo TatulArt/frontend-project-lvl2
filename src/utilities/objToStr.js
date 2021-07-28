@@ -1,20 +1,19 @@
 import _ from 'lodash';
+import { addElementsToArray } from './mutationLessUtilities.js';
 
-const diffToStr = (diff, depthLevel = 1) => diff.map((diffElement) => {
-  if (_.isArray(diffElement[0])) {
-    const [previousKey, previousValue] = diffElement[0];
-    const [presentKey, presentValue] = diffElement[1];
+const objToStr = (obj, depthLevel = 1) => {
+  const keys = Object.keys(obj);
 
-    return `${previousKey}: ${previousValue}\n${'  '.repeat(depthLevel)}${presentKey}: ${presentValue}`;
-  }
+  const resultPrototype = keys.reduce((acc, key) => {
+    if (_.isObject(obj[key]) && !Array.isArray(obj[key])) {
+      return addElementsToArray(acc, `${'  '.repeat(depthLevel)}${key}: ${objToStr(obj[key], depthLevel + 2)}`);
+    }
 
-  const [key, value] = diffElement;
+    return addElementsToArray(acc, `${'  '.repeat(depthLevel)}${key}: ${obj[key]}`);
+  }, []).join('\n');
 
-  if (_.isArray(value)) {
-    return `${key}: {\n${'  '.repeat(depthLevel + 1)}${diffToStr(value, depthLevel + 1)}\n${'  '.repeat(depthLevel + 1)}}`;
-  }
+  const result = addElementsToArray([], '{', resultPrototype, `${'  '.repeat(depthLevel - 1)}}`);
+  return result.join('\n');
+};
 
-  return `${key}: '${value}'`;
-}).join(`\n${'  '.repeat(depthLevel)}`);
-
-export default diffToStr;
+export default objToStr;
