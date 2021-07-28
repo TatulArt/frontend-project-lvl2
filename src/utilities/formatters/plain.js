@@ -9,34 +9,32 @@ const getValidValue = (data) => {
   return _.isObject(data) ? '[complex value]' : `'${data}'`;
 };
 
-const plain = (diff, path = '') => diff.reduce((acc, diffElement) => {
-  const currentPath = `${path}${diffElement.key}`;
-
-  if (diffElement.state === 'changed') {
-    const previousValue = getValidValue(diffElement.value[0]);
-    const presentValue = getValidValue(diffElement.value[1]);
-
-    const message = `Property '${currentPath}' was updated. From ${previousValue} to ${presentValue}`;
-    return addElementsToArray(acc, message);
+const getMessageByState = (state, value) => {
+  switch (state) {
+    case 'changed':
+      return `was updated. From ${getValidValue(value[0])} to ${getValidValue(value[1])}`;
+    case 'added':
+      return `was added with value: ${getValidValue(value)}`;
+    case 'removed':
+      return 'was removed';
+    default:
+      throw new Error(`Unknown state: ${state}`);
   }
+};
+
+const plain = (diff, path = '') => diff.reduce((acc, diffElement) => {
+  if (diffElement.state === 'unchanged') {
+    return acc;
+  }
+
+  const currentPath = `${path}${diffElement.key}`;
 
   if (diffElement.state === 'sameNameObjects') {
     return addElementsToArray(acc, plain(diffElement.value, `${currentPath}.`));
   }
 
-  const value = getValidValue(diffElement.value);
-
-  if (diffElement.state === 'added') {
-    const message = `Property '${currentPath}' was added with value: ${value}`;
-    return addElementsToArray(acc, message);
-  }
-
-  if (diffElement.state === 'removed') {
-    const message = `Property '${currentPath}' was removed`;
-    return addElementsToArray(acc, message);
-  }
-
-  return acc;
+  const message = `Property '${currentPath}' ${getMessageByState(diffElement.state, diffElement.value)}`;
+  return addElementsToArray(acc, message);
 }, []).join('\n');
 
 export default plain;

@@ -10,8 +10,6 @@ const modifyKeyByState = (state, key) => {
       return `  ${key}`;
     case 'unchanged':
       return `  ${key}`;
-    case 'unchangedObject':
-      return `  ${key}`;
     case 'removed':
       return `- ${key}`;
     default:

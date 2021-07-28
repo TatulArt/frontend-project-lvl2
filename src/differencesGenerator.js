@@ -13,14 +13,14 @@ const processUnchangedObject = (value) => {
         return {
           key,
           value: processUnchangedObject(value[key]),
-          state: 'unchangedObject',
+          state: 'unchanged',
         };
       }
 
       return {
         key,
         value: value[key],
-        state: 'unchangedObject',
+        state: 'unchanged',
       };
     });
   }
