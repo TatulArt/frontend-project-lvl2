@@ -31,42 +31,22 @@ const differencesGenerator = (obj1, obj2) => {
 
   const filesDiffrences = keys.map((key) => {
     if (obj2[key] === obj1[key]) {
-      return {
-        key,
-        value: processUnchangedObject(obj1[key]),
-        state: 'unchanged',
-      };
+      return { key, value: processUnchangedObject(obj1[key]), state: 'unchanged' };
     }
 
     if (!_.hasIn(obj1, key)) {
-      return {
-        key,
-        value: processUnchangedObject(obj2[key]),
-        state: 'added',
-      };
+      return { key, value: processUnchangedObject(obj2[key]), state: 'added' };
     }
 
     if (!_.hasIn(obj2, key)) {
-      return {
-        key,
-        value: processUnchangedObject(obj1[key]),
-        state: 'removed',
-      };
+      return { key, value: processUnchangedObject(obj1[key]), state: 'removed' };
     }
 
     if (_.isObject(obj1[key]) && _.isObject(obj2[key])) {
-      return {
-        key,
-        value: differencesGenerator(obj1[key], obj2[key]),
-        state: 'sameNameObjects',
-      };
+      return { key, value: differencesGenerator(obj1[key], obj2[key]), state: 'sameNameObjects' };
     }
 
-    return {
-      key,
-      value: [processUnchangedObject(obj1[key]), processUnchangedObject(obj2[key])],
-      state: 'changed',
-    };
+    return { key, value: [processUnchangedObject(obj1[key]), processUnchangedObject(obj2[key])], state: 'changed' };
   });
 
   return filesDiffrences;
