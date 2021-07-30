@@ -18,23 +18,22 @@ const modifyKeyByState = (state, key) => {
 };
 
 const getStylishDiff = (data) => {
-  if (_.isArray(data)) {
-    const stylishDiff = data.reduce((acc, dataElement) => {
-      if (dataElement.state === 'changed') {
-        const [previousValue, presentValue] = dataElement.value;
-
-        const newAccPrototype = addElementsToObject(acc, `- ${dataElement.key}`, getStylishDiff(previousValue));
-        return addElementsToObject(newAccPrototype, `+ ${dataElement.key}`, getStylishDiff(presentValue));
-      }
-
-      const newKey = modifyKeyByState(dataElement.state, dataElement.key);
-      return addElementsToObject(acc, newKey, getStylishDiff(dataElement.value));
-    }, {});
-
-    return stylishDiff;
+  if (!_.isArray(data)) {
+    return data;
   }
 
-  return data;
+  const stylishDiff = data.reduce((acc, dataElement) => {
+    if (dataElement.state === 'changed') {
+      const [previousValue, presentValue] = dataElement.value;
+
+      return addElementsToObject(addElementsToObject(acc, `- ${dataElement.key}`, getStylishDiff(previousValue)), `+ ${dataElement.key}`, getStylishDiff(presentValue));
+    }
+
+    const newKey = modifyKeyByState(dataElement.state, dataElement.key);
+    return addElementsToObject(acc, newKey, getStylishDiff(dataElement.value));
+  }, {});
+
+  return stylishDiff;
 };
 
 const stylish = (diff) => {
