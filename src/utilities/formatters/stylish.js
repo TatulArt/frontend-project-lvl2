@@ -22,18 +22,15 @@ const getStylishDiff = (data) => {
     return data;
   }
 
-  const stylishDiff = data.reduce((acc, dataElement) => {
+  return data.reduce((acc, dataElement) => {
     if (dataElement.state === 'changed') {
       const [previousValue, presentValue] = dataElement.value;
-
-      return addElementsToObject(addElementsToObject(acc, `- ${dataElement.key}`, getStylishDiff(previousValue)), `+ ${dataElement.key}`, getStylishDiff(presentValue));
+      return addElementsToObject(acc, `- ${dataElement.key}`, getStylishDiff(previousValue), `+ ${dataElement.key}`, getStylishDiff(presentValue));
     }
 
     const newKey = modifyKeyByState(dataElement.state, dataElement.key);
     return addElementsToObject(acc, newKey, getStylishDiff(dataElement.value));
   }, {});
-
-  return stylishDiff;
 };
 
 const stylish = (diff) => {
