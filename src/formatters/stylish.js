@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import objToStr from '../objToStr.js';
-import { addElementsToObject } from '../mutationLessUtilities.js';
 
 const modifyKeyByType = (type, key) => {
   switch (type) {
@@ -25,11 +24,11 @@ const getStylishDiff = (data) => {
   return data.reduce((acc, dataElement) => {
     if (dataElement.type === 'changed') {
       const [previousValue, presentValue] = dataElement.value;
-      return addElementsToObject(acc, `- ${dataElement.key}`, getStylishDiff(previousValue), `+ ${dataElement.key}`, getStylishDiff(presentValue));
+      return _.assign(acc, { [`- ${dataElement.key}`]: getStylishDiff(previousValue), [`+ ${dataElement.key}`]: getStylishDiff(presentValue) });
     }
 
     const newKey = modifyKeyByType(dataElement.type, dataElement.key);
-    return addElementsToObject(acc, newKey, getStylishDiff(dataElement.value));
+    return _.assign(acc, { [newKey]: getStylishDiff(dataElement.value) });
   }, {});
 };
 

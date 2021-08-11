@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { addElementsToObject } from './mutationLessUtilities.js';
 
 const processUnchangedObject = (value) => {
   if (_.isObject(value) && !_.isArray(value)) {
@@ -12,7 +11,11 @@ const processUnchangedObject = (value) => {
         type: 'unchanged',
       };
 
-      return _.isObject(value[key]) && !_.isArray(value[key]) ? addElementsToObject(result, 'value', processUnchangedObject(value[key])) : result;
+      if (_.isObject(value[key]) && !_.isArray(value[key])) {
+        return _.assign(result, { value: processUnchangedObject(value[key]) });
+      }
+
+      return result;
     });
   }
 

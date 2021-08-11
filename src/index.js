@@ -6,7 +6,7 @@ import getDifferences from './getDifferences.js';
 
 const parseData = (filepath) => {
   const data = readFileSync(path.resolve(process.cwd(), filepath), 'utf-8');
-  const format = filepath.split('.').pop();
+  const format = filepath.split('.')[1];
 
   return parse(data, format);
 };

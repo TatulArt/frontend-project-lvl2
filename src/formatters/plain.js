@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { addElementsToArray } from '../mutationLessUtilities.js';
+import addElementsToArray from '../addElementsToArray.js';
 
 const getValidValue = (data) => {
   if (typeof data !== 'string' && !_.isObject(data)) {
