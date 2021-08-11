@@ -1,9 +1,11 @@
 /* eslint no-undef: 0 */
 
+import { readFileSync } from 'fs';
 import genDiff from '../src/index.js';
-import expectedResultStylish from '../__fixtures__/expected_result_fixtures/expectedStylish.js';
-import expectedResultPlain from '../__fixtures__/expected_result_fixtures/expectedPlain.js';
-import expectedResultJson from '../__fixtures__/expected_result_fixtures/expectedJson.js';
+
+const expectedResultStylish = readFileSync('__fixtures__/expectedStylish.txt', 'utf-8');
+const expectedResultPlain = readFileSync('__fixtures__/expectedPlain.txt', 'utf-8');
+const expectedResultJson = readFileSync('__fixtures__/expectedJson.txt', 'utf-8');
 
 test('differentFormats', () => {
   expect(genDiff('__fixtures__/file1.yaml', '__fixtures__/file2.yaml')).toEqual(expectedResultStylish);

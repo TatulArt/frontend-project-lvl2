@@ -16,21 +16,20 @@ const modifyKeyByType = (type, key) => {
   }
 };
 
-const getStylishDiff = (data) => {
-  if (!_.isArray(data)) {
-    return data;
+const getStylishDiff = (data) => data.reduce((acc, dataElement) => {
+  if (dataElement.type === 'changed') {
+    const [previousValue, presentValue] = dataElement.value;
+    return _.assign(acc, { [`- ${dataElement.key}`]: previousValue, [`+ ${dataElement.key}`]: presentValue });
   }
 
-  return data.reduce((acc, dataElement) => {
-    if (dataElement.type === 'changed') {
-      const [previousValue, presentValue] = dataElement.value;
-      return _.assign(acc, { [`- ${dataElement.key}`]: getStylishDiff(previousValue), [`+ ${dataElement.key}`]: getStylishDiff(presentValue) });
-    }
+  const newKey = modifyKeyByType(dataElement.type, dataElement.key);
 
-    const newKey = modifyKeyByType(dataElement.type, dataElement.key);
-    return _.assign(acc, { [newKey]: getStylishDiff(dataElement.value) });
-  }, {});
-};
+  if (dataElement.type === 'nested') {
+    return _.assign(acc, { [newKey]: getStylishDiff(dataElement.children) });
+  }
+
+  return _.assign(acc, { [newKey]: dataElement.value });
+}, {});
 
 const stylish = (diff) => {
   const stylishDiff = getStylishDiff(diff);

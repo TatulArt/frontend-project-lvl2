@@ -4,20 +4,19 @@ import parse from './parser.js';
 import formatters from './formatters/index.js';
 import getDifferences from './getDifferences.js';
 
-const parseData = (filepath) => {
-  const data = readFileSync(path.resolve(process.cwd(), filepath), 'utf-8');
-  const format = filepath.split('.')[1];
+const getFullPath = (filepath) => path.resolve(process.cwd(), filepath);
+const getFormat = (filepath) => filepath.split('.')[1];
+
+const getParsedData = (filepath) => {
+  const data = readFileSync(getFullPath(filepath), 'utf-8');
+  const format = getFormat(filepath);
 
   return parse(data, format);
 };
 
 const genDiff = (filepath1, filepath2, format = 'stylish') => {
-  if (filepath1 === '' || filepath2 === '') {
-    throw new Error('Error! Filepath is not readable.');
-  }
-
-  const parsedData1 = parseData(filepath1);
-  const parsedData2 = parseData(filepath2);
+  const parsedData1 = getParsedData(filepath1);
+  const parsedData2 = getParsedData(filepath2);
 
   const diff = getDifferences(parsedData1, parsedData2);
 

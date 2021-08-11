@@ -30,7 +30,7 @@ const plain = (diff, path = '') => diff.reduce((acc, diffElement) => {
   const currentPath = `${path}${diffElement.key}`;
 
   if (diffElement.type === 'nested') {
-    return addElementsToArray(acc, plain(diffElement.value, `${currentPath}.`));
+    return addElementsToArray(acc, plain(diffElement.children, `${currentPath}.`));
   }
 
   const message = `Property '${currentPath}' ${getMessageByType(diffElement.type, diffElement.value)}`;

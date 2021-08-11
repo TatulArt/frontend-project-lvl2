@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
 const getDiffObject = (diff) => diff.reduce((acc, diffElement) => {
-  if (_.isArray(diffElement.value) && diffElement.type !== 'changed') {
-    return _.assign(acc, { [diffElement.key]: getDiffObject(diffElement.value) });
+  if (diffElement.type === 'nested') {
+    return _.assign(acc, { [diffElement.key]: getDiffObject(diffElement.children) });
   }
 
   return _.assign(acc, { [diffElement.key]: diffElement.value });
