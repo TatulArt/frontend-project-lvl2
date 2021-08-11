@@ -1,4 +1,4 @@
-name: differences-generator-check
+name: gendiff-check
 
 on:
   push:

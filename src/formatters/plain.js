@@ -9,8 +9,8 @@ const getValidValue = (data) => {
   return _.isObject(data) ? '[complex value]' : `'${data}'`;
 };
 
-const getMessageByState = (state, value) => {
-  switch (state) {
+const getMessageByType = (type, value) => {
+  switch (type) {
     case 'changed':
       return `was updated. From ${getValidValue(value[0])} to ${getValidValue(value[1])}`;
     case 'added':
@@ -18,22 +18,22 @@ const getMessageByState = (state, value) => {
     case 'removed':
       return 'was removed';
     default:
-      throw new Error(`Unknown state: ${state}`);
+      throw new Error(`Unknown type: ${type}`);
   }
 };
 
 const plain = (diff, path = '') => diff.reduce((acc, diffElement) => {
-  if (diffElement.state === 'unchanged') {
+  if (diffElement.type === 'unchanged') {
     return acc;
   }
 
   const currentPath = `${path}${diffElement.key}`;
 
-  if (diffElement.state === 'sameNameObjects') {
+  if (diffElement.type === 'nested') {
     return addElementsToArray(acc, plain(diffElement.value, `${currentPath}.`));
   }
 
-  const message = `Property '${currentPath}' ${getMessageByState(diffElement.state, diffElement.value)}`;
+  const message = `Property '${currentPath}' ${getMessageByType(diffElement.type, diffElement.value)}`;
   return addElementsToArray(acc, message);
 }, []).join('\n');
 

@@ -2,18 +2,18 @@ import _ from 'lodash';
 import objToStr from '../objToStr.js';
 import { addElementsToObject } from '../mutationLessUtilities.js';
 
-const modifyKeyByState = (state, key) => {
-  switch (state) {
+const modifyKeyByType = (type, key) => {
+  switch (type) {
     case 'added':
       return `+ ${key}`;
-    case 'sameNameObjects':
+    case 'nested':
       return `  ${key}`;
     case 'unchanged':
       return `  ${key}`;
     case 'removed':
       return `- ${key}`;
     default:
-      throw new Error(`Unknown state: ${state}`);
+      throw new Error(`Unknown type: ${type}`);
   }
 };
 
@@ -23,12 +23,12 @@ const getStylishDiff = (data) => {
   }
 
   return data.reduce((acc, dataElement) => {
-    if (dataElement.state === 'changed') {
+    if (dataElement.type === 'changed') {
       const [previousValue, presentValue] = dataElement.value;
       return addElementsToObject(acc, `- ${dataElement.key}`, getStylishDiff(previousValue), `+ ${dataElement.key}`, getStylishDiff(presentValue));
     }
 
-    const newKey = modifyKeyByState(dataElement.state, dataElement.key);
+    const newKey = modifyKeyByType(dataElement.type, dataElement.key);
     return addElementsToObject(acc, newKey, getStylishDiff(dataElement.value));
   }, {});
 };

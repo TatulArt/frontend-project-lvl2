@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { addElementsToObject } from '../mutationLessUtilities.js';
 
 const getDiffObject = (diff) => diff.reduce((acc, diffElement) => {
-  if (_.isArray(diffElement.value) && diffElement.state !== 'changed') {
+  if (_.isArray(diffElement.value) && diffElement.type !== 'changed') {
     return addElementsToObject(acc, diffElement.key, getDiffObject(diffElement.value));
   }
 
