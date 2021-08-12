@@ -8,7 +8,9 @@ const getFullPath = (filepath) => path.resolve(process.cwd(), filepath);
 const getFormat = (filepath) => filepath.split('.')[1];
 
 const getParsedData = (filepath) => {
-  const data = readFileSync(getFullPath(filepath), 'utf-8');
+  const fullPath = path.isAbsolute(filepath) ? filepath : getFullPath(filepath);
+
+  const data = readFileSync(fullPath, 'utf-8');
   const format = getFormat(filepath);
 
   return parse(data, format);
