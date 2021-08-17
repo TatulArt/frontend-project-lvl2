@@ -22,7 +22,7 @@ const getMessageByType = (type, value) => {
   }
 };
 
-const plain = (diff, path = '') => diff.reduce((acc, diffElement) => {
+const generatePlainDiff = (diff, path = '') => diff.reduce((acc, diffElement) => {
   if (diffElement.type === 'unchanged') {
     return acc;
   }
@@ -30,11 +30,11 @@ const plain = (diff, path = '') => diff.reduce((acc, diffElement) => {
   const currentPath = `${path}${diffElement.key}`;
 
   if (diffElement.type === 'nested') {
-    return addElementsToArray(acc, plain(diffElement.children, `${currentPath}.`));
+    return addElementsToArray(acc, generatePlainDiff(diffElement.children, `${currentPath}.`));
   }
 
   const message = `Property '${currentPath}' ${getMessageByType(diffElement.type, diffElement.value)}`;
   return addElementsToArray(acc, message);
 }, []).join('\n');
 
-export default plain;
+export default generatePlainDiff;

@@ -8,6 +8,6 @@ const getDiffObject = (diff) => diff.reduce((acc, diffElement) => {
   return _.assign(acc, { [diffElement.key]: diffElement.value });
 }, {});
 
-const json = (diff) => JSON.stringify(getDiffObject(diff));
+const generateJsonDiff = (diff) => JSON.stringify(getDiffObject(diff));
 
-export default json;
+export default generateJsonDiff;

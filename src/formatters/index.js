@@ -1,9 +1,9 @@
-import stylish from './stylish.js';
-import plain from './plain.js';
-import json from './json.js';
+import generateStylishDiff from './generateStylishDiff.js';
+import generatePlainDiff from './generatePlainDiff.js';
+import generateJsonDiff from './generateJsonDiff.js';
 
 export default {
-  stylish,
-  plain,
-  json,
+  generateStylishDiff,
+  generatePlainDiff,
+  generateJsonDiff,
 };
