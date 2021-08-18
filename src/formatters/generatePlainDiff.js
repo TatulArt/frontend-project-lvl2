@@ -19,7 +19,7 @@ const generatePlainDiff = (diff, path = '') => diff.map((diffElement) => {
     case 'removed':
       return `Property ${path}${diffElement.key} was removed`;
     case 'unchanged':
-      return;
+      break;
     default:
       throw new Error(`Unknown type: ${diffElement.type}`);
   }
