@@ -8,21 +8,23 @@ const getValidValue = (data) => {
   return _.isObject(data) ? '[complex value]' : `'${data}'`;
 };
 
-const generatePlainDiff = (diff, path = '') => diff.map((diffElement) => {
-  switch (diffElement.type) {
-    case 'nested':
-      return generatePlainDiff(diffElement.children, `${path}${diffElement.key}.`);
-    case 'changed':
-      return `Property ${path}${diffElement.key} was updated. From ${getValidValue(diffElement.value[0])} to ${getValidValue(diffElement.value[1])}`;
-    case 'added':
-      return `Property ${path}${diffElement.key} was added with value: ${getValidValue(diffElement.value)}`;
-    case 'removed':
-      return `Property ${path}${diffElement.key} was removed`;
-    case 'unchanged':
-      break;
-    default:
-      throw new Error(`Unknown type: ${diffElement.type}`);
-  }
-}).join('\n');
+const generatePlainDiff = (tree, path = '') => {
+  const treeWithoutUnchangedElements = tree.filter((treeElement) => treeElement.type !== 'unchanged');
+
+  return treeWithoutUnchangedElements.map((treeElement) => {
+    switch (treeElement.type) {
+      case 'nested':
+        return generatePlainDiff(treeElement.children, `${path}${treeElement.key}.`);
+      case 'changed':
+        return `Property '${path}${treeElement.key}' was updated. From ${getValidValue(treeElement.value[0])} to ${getValidValue(treeElement.value[1])}`;
+      case 'added':
+        return `Property '${path}${treeElement.key}' was added with value: ${getValidValue(treeElement.value)}`;
+      case 'removed':
+        return `Property '${path}${treeElement.key}' was removed`;
+      default:
+        throw new Error(`Unknown type: ${treeElement.type}`);
+    }
+  }).join('\n');
+};
 
 export default generatePlainDiff;

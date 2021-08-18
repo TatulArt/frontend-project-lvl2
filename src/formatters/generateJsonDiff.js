@@ -1,13 +1,13 @@
 import _ from 'lodash';
 
-const getDiffObject = (diff) => diff.reduce((acc, diffElement) => {
-  if (diffElement.type === 'nested') {
-    return _.assign(acc, { [diffElement.key]: getDiffObject(diffElement.children) });
+const getTreeObject = (tree) => tree.reduce((acc, treeElement) => {
+  if (treeElement.type === 'nested') {
+    return _.assign(acc, { [treeElement.key]: getTreeObject(treeElement.children) });
   }
 
-  return _.assign(acc, { [diffElement.key]: diffElement.value });
+  return _.assign(acc, { [treeElement.key]: treeElement.value });
 }, {});
 
-const generateJsonDiff = (diff) => JSON.stringify(getDiffObject(diff));
+const generateJsonDiff = (tree) => JSON.stringify(getTreeObject(tree));
 
 export default generateJsonDiff;

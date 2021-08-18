@@ -18,21 +18,21 @@ const stringifyValue = (value, depthLevel) => {
   return value;
 };
 
-const generateStylishDiff = (diff, depthLevel = 1) => {
-  const resultPrototype = diff.map((diffElement) => {
-    switch (diffElement.type) {
+const generateStylishDiff = (tree, depthLevel = 1) => {
+  const resultPrototype = tree.map((treeElement) => {
+    switch (treeElement.type) {
       case 'nested':
-        return `${'  '.repeat(depthLevel)}  ${diffElement.key}: ${generateStylishDiff(diffElement.children, depthLevel + 2)}`;
+        return `${'  '.repeat(depthLevel)}  ${treeElement.key}: ${generateStylishDiff(treeElement.children, depthLevel + 2)}`;
       case 'changed':
-        return `${'  '.repeat(depthLevel)}- ${diffElement.key}: ${stringifyValue(diffElement.value[0], depthLevel + 2)}\n${'  '.repeat(depthLevel)}+ ${diffElement.key}: ${stringifyValue(diffElement.value[1], depthLevel + 2)}`;
+        return `${'  '.repeat(depthLevel)}- ${treeElement.key}: ${stringifyValue(treeElement.value[0], depthLevel + 2)}\n${'  '.repeat(depthLevel)}+ ${treeElement.key}: ${stringifyValue(treeElement.value[1], depthLevel + 2)}`;
       case 'added':
-        return `${'  '.repeat(depthLevel)}+ ${diffElement.key}: ${stringifyValue(diffElement.value, depthLevel + 2)}`;
+        return `${'  '.repeat(depthLevel)}+ ${treeElement.key}: ${stringifyValue(treeElement.value, depthLevel + 2)}`;
       case 'unchanged':
-        return `${'  '.repeat(depthLevel)}  ${diffElement.key}: ${stringifyValue(diffElement.value, depthLevel + 2)}`;
+        return `${'  '.repeat(depthLevel)}  ${treeElement.key}: ${stringifyValue(treeElement.value, depthLevel + 2)}`;
       case 'removed':
-        return `${'  '.repeat(depthLevel)}- ${diffElement.key}: ${stringifyValue(diffElement.value, depthLevel + 2)}`;
+        return `${'  '.repeat(depthLevel)}- ${treeElement.key}: ${stringifyValue(treeElement.value, depthLevel + 2)}`;
       default:
-        throw new Error(`Unknown type: ${diffElement.type}`);
+        throw new Error(`Unknown type: ${treeElement.type}`);
     }
   }).join('\n');
 
