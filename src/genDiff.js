@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import path from 'path';
 import parse from './parser.js';
-import formatters from './formatters/index.js';
+import getFormater from './formatters/index.js';
 import generateDiffTree from './generateDiffTree.js';
 
 const getFullPath = (filepath) => path.resolve(process.cwd(), filepath);
@@ -14,7 +14,7 @@ const genDiff = (filepath1, filepath2, format = 'stylish') => {
 
   const diff = generateDiffTree(parsedData1, parsedData2);
 
-  const selectedFormater = formatters[format];
+  const selectedFormater = getFormater(format);
   return selectedFormater(diff);
 };
 

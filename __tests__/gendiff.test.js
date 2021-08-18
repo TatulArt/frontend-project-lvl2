@@ -10,10 +10,10 @@ const expectedResultStylish = readFileSync(getFixturePath('expectedStylish.txt')
 const expectedResultPlain = readFileSync(getFixturePath('expectedPlain.txt'), 'utf-8');
 const expectedResultJson = readFileSync(getFixturePath('expectedJson.txt'), 'utf-8');
 
-test.each([
-  { modeName: 'Stylish', result: genDiff(getFixturePath('file1.json'), getFixturePath('file2.json')), expected: expectedResultStylish },
-  { modeName: 'Plain', result: genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'), 'plain'), expected: expectedResultPlain },
-  { modeName: 'JSON', result: genDiff(getFixturePath('file1.json'), getFixturePath('file2.json'), 'json'), expected: expectedResultJson },
-])('Gendiff $modeName mode', (data) => {
-  expect(data.result).toEqual(data.expected);
+test.each(['json', 'yaml'])('', (format) => {
+  const filepath1 = getFixturePath(`file1.${format}`);
+  const filepath2 = getFixturePath(`file2.${format}`);
+  expect(genDiff(filepath1, filepath2)).toEqual(expectedResultStylish);
+  expect(genDiff(filepath1, filepath2, 'plain')).toEqual(expectedResultPlain);
+  expect(genDiff(filepath1, filepath2, 'json')).toEqual(expectedResultJson);
 });
