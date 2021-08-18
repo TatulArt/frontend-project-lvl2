@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import addElementsToArray from '../addElementsToArray.js';
 
 const getValidValue = (data) => {
   if (typeof data !== 'string' && !_.isObject(data)) {
@@ -9,32 +8,25 @@ const getValidValue = (data) => {
   return _.isObject(data) ? '[complex value]' : `'${data}'`;
 };
 
-const getMessageByType = (type, value) => {
-  switch (type) {
-    case 'changed':
-      return `was updated. From ${getValidValue(value[0])} to ${getValidValue(value[1])}`;
-    case 'added':
-      return `was added with value: ${getValidValue(value)}`;
-    case 'removed':
-      return 'was removed';
-    default:
-      throw new Error(`Unknown type: ${type}`);
-  }
-};
-
-const generatePlainDiff = (diff, path = '') => diff.reduce((acc, diffElement) => {
+const generatePlainDiff = (diff, path = '') => diff.map((diffElement) => {
   if (diffElement.type === 'unchanged') {
-    return acc;
+    return;
   }
 
   const currentPath = `${path}${diffElement.key}`;
 
-  if (diffElement.type === 'nested') {
-    return addElementsToArray(acc, generatePlainDiff(diffElement.children, `${currentPath}.`));
+  switch (diffElement.type) {
+    case 'nested':
+      return generatePlainDiff(diffElement.children, `${currentPath}.`);
+    case 'changed':
+      return `Property ${currentPath} was updated. From ${getValidValue(diffElement.value[0])} to ${getValidValue(diffElement.value[1])}`;
+    case 'added':
+      return `Property ${currentPath} was added with value: ${getValidValue(diffElement.value)}`;
+    case 'removed':
+      return `Property ${currentPath} was removed`;
+    default:
+      throw new Error(`Unknown type: ${diffElement.type}`);
   }
-
-  const message = `Property '${currentPath}' ${getMessageByType(diffElement.type, diffElement.value)}`;
-  return addElementsToArray(acc, message);
-}, []).join('\n');
+}).join('\n');
 
 export default generatePlainDiff;
