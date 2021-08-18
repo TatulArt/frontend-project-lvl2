@@ -1,6 +1,5 @@
 import generateStylishDiff from './generateStylishDiff.js';
 import generatePlainDiff from './generatePlainDiff.js';
-import generateJsonDiff from './generateJsonDiff.js';
 
 export default (formaterName) => {
   switch (formaterName) {
@@ -9,7 +8,7 @@ export default (formaterName) => {
     case 'plain':
       return generatePlainDiff;
     case 'json':
-      return generateJsonDiff;
+      return (tree) => JSON.stringify(tree);
     default:
       throw new Error(`Unknown formater name: ${formaterName}`);
   }
