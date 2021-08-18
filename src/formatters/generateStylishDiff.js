@@ -1,7 +1,11 @@
 import _ from 'lodash';
 
 const stringifyValue = (value, depthLevel) => {
-  if (_.isObject(value) && !_.isArray(value)) {
+  if (_.isArray(value)) {
+    return `[${value.join(', ')}]`;
+  }
+
+  if (_.isObject(value)) {
     const keys = Object.keys(value);
 
     const resultValue = keys.map((key) => {
@@ -15,7 +19,7 @@ const stringifyValue = (value, depthLevel) => {
     return ['{', resultValue, `${'  '.repeat(depthLevel - 1)}}`].join('\n');
   }
 
-  return value;
+  return String(value);
 };
 
 const generateStylishDiff = (tree, depthLevel = 1) => {
