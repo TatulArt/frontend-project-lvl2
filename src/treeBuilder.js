@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const generateDiffTree = (obj1, obj2) => {
+const buildTree = (obj1, obj2) => {
   const keys1 = Object.keys(obj1);
   const keys2 = Object.keys(obj2);
 
@@ -16,7 +16,7 @@ const generateDiffTree = (obj1, obj2) => {
     }
 
     if (_.isObject(obj1[key]) && _.isObject(obj2[key])) {
-      return { key, children: generateDiffTree(obj1[key], obj2[key]), type: 'nested' };
+      return { key, children: buildTree(obj1[key], obj2[key]), type: 'nested' };
     }
 
     if (obj2[key] === obj1[key]) {
@@ -29,4 +29,4 @@ const generateDiffTree = (obj1, obj2) => {
   return filesDiffrences;
 };
 
-export default generateDiffTree;
+export default buildTree;

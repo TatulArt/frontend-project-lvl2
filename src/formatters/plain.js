@@ -8,13 +8,13 @@ const getValidValue = (data) => {
   return _.isObject(data) ? '[complex value]' : `'${data}'`;
 };
 
-const generatePlainDiff = (tree, path = '') => {
+const renderPlain = (tree, path = '') => {
   const treeWithoutUnchangedElements = tree.filter((treeElement) => treeElement.type !== 'unchanged');
 
   return treeWithoutUnchangedElements.map((treeElement) => {
     switch (treeElement.type) {
       case 'nested':
-        return generatePlainDiff(treeElement.children, `${path}${treeElement.key}.`);
+        return renderPlain(treeElement.children, `${path}${treeElement.key}.`);
       case 'changed':
         return `Property '${path}${treeElement.key}' was updated. From ${getValidValue(treeElement.value[0])} to ${getValidValue(treeElement.value[1])}`;
       case 'added':
@@ -27,4 +27,4 @@ const generatePlainDiff = (tree, path = '') => {
   }).join('\n');
 };
 
-export default generatePlainDiff;
+export default renderPlain;

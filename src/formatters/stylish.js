@@ -22,11 +22,11 @@ const stringifyValue = (value, depthLevel) => {
   return String(value);
 };
 
-const generateStylishDiff = (tree, depthLevel = 1) => {
+const renderStylish = (tree, depthLevel = 1) => {
   const resultPrototype = tree.map((treeElement) => {
     switch (treeElement.type) {
       case 'nested':
-        return `${'  '.repeat(depthLevel)}  ${treeElement.key}: ${generateStylishDiff(treeElement.children, depthLevel + 2)}`;
+        return `${'  '.repeat(depthLevel)}  ${treeElement.key}: ${renderStylish(treeElement.children, depthLevel + 2)}`;
       case 'changed':
         return `${'  '.repeat(depthLevel)}- ${treeElement.key}: ${stringifyValue(treeElement.value[0], depthLevel + 2)}\n${'  '.repeat(depthLevel)}+ ${treeElement.key}: ${stringifyValue(treeElement.value[1], depthLevel + 2)}`;
       case 'added':
@@ -44,4 +44,4 @@ const generateStylishDiff = (tree, depthLevel = 1) => {
   return result.join('\n');
 };
 
-export default generateStylishDiff;
+export default renderStylish;

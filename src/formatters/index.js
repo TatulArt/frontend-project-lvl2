@@ -1,12 +1,12 @@
-import generateStylishDiff from './generateStylishDiff.js';
-import generatePlainDiff from './generatePlainDiff.js';
+import renderStylish from './stylish.js';
+import renderPlain from './plain.js';
 
 export default (formaterName) => {
   switch (formaterName) {
     case 'stylish':
-      return generateStylishDiff;
+      return renderStylish;
     case 'plain':
-      return generatePlainDiff;
+      return renderPlain;
     case 'json':
       return (tree) => JSON.stringify(tree);
     default:
