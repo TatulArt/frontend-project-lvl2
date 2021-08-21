@@ -1,30 +1,34 @@
 import _ from 'lodash';
 
 const getValidValue = (data) => {
-  if (typeof data !== 'string' && !_.isObject(data)) {
-    return `${data}`;
+  if (_.isObject(data)) {
+    return '[complex value]';
   }
 
-  return _.isObject(data) ? '[complex value]' : `'${data}'`;
+  if (typeof data !== 'string') {
+    return String(data);
+  }
+
+  return `'${data}'`;
 };
 
 const renderPlain = (tree, path = '') => {
-  const treeWithoutUnchangedElements = tree.filter((treeElement) => treeElement.type !== 'unchanged');
+  const filteredTree = tree.filter((node) => node.type !== 'unchanged');
 
-  return treeWithoutUnchangedElements.map((treeElement) => {
-    switch (treeElement.type) {
+  return filteredTree.map((node) => {
+    switch (node.type) {
       case 'nested':
-        return renderPlain(treeElement.children, `${path}${treeElement.key}.`);
+        return renderPlain(node.children, `${path}${node.key}.`);
       case 'changed':
-        return `Property '${path}${treeElement.key}' was updated. From ${getValidValue(treeElement.value[0])} to ${getValidValue(treeElement.value[1])}`;
+        return `Property '${path}${node.key}' was updated. From ${getValidValue(node.oldValue)} to ${getValidValue(node.newValue)}`;
       case 'added':
-        return `Property '${path}${treeElement.key}' was added with value: ${getValidValue(treeElement.value)}`;
+        return `Property '${path}${node.key}' was added with value: ${getValidValue(node.value)}`;
       case 'removed':
-        return `Property '${path}${treeElement.key}' was removed`;
+        return `Property '${path}${node.key}' was removed`;
       default:
-        throw new Error(`Unknown type: ${treeElement.type}`);
+        throw new Error(`Unknown type: ${node.type}`);
     }
   }).join('\n');
 };
 
-export default renderPlain;
+export default (tree) => renderPlain(tree);

@@ -4,9 +4,9 @@ const buildTree = (obj1, obj2) => {
   const keys1 = Object.keys(obj1);
   const keys2 = Object.keys(obj2);
 
-  const unitedKeys = _.sortBy(_.union(keys1, keys2));
+  const allKeys = _.sortBy(_.union(keys1, keys2));
 
-  const filesDiffrences = unitedKeys.map((key) => {
+  const diff = allKeys.map((key) => {
     if (!_.hasIn(obj1, key)) {
       return { key, value: obj2[key], type: 'added' };
     }
@@ -23,10 +23,15 @@ const buildTree = (obj1, obj2) => {
       return { key, value: obj1[key], type: 'unchanged' };
     }
 
-    return { key, value: [obj1[key], obj2[key]], type: 'changed' };
+    return {
+      key,
+      oldValue: obj1[key],
+      newValue: obj2[key],
+      type: 'changed',
+    };
   });
 
-  return filesDiffrences;
+  return diff;
 };
 
 export default buildTree;
